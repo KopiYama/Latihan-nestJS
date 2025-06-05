@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -29,8 +30,8 @@ export class UserController {
   }
 
   @HttpPost()
-  create(@Body() userData: Partial<User>): Promise<User> {
-    return this.userService.create(userData);
+  create(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return this.userService.create(createUserDto);
   }
 
   @Put(':id')

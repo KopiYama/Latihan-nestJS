@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
@@ -7,6 +7,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { User } from './user/user.entity';
 import { Post } from './post/post.entity';
+import { AuthModule } from './auth/auth.module';
+import { LoggingMiddleware } from './common/middleware/logging.middleware';
+import { AuthMiddleware } from './common/middleware/auth.middleware';
+
 
 @Module({
   imports: [
@@ -29,8 +33,14 @@ import { Post } from './post/post.entity';
     }),
     UserModule,
     PostModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggingMiddleware).forRoutes('*'); // aktif untuk semua route
+    consumer.apply(AuthMiddleware).forRoutes('posts', 'users'); // hanya route posts damD users yang diamankan
+  }
+}
